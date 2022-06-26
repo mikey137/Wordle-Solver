@@ -9,6 +9,8 @@ function WordleSolver() {
     const [includedLetters, setIncludedLetters] = useState("")
     const [wordList, setWordList] = useState(WordList)
     const [isFirstGuessSubmitted, setIsFirstGuessSubmitted] = useState(false)
+    const [duplicateLetterInGuess, setDuplicateLetterInGuess] = useState("")
+    const [duplicateLettersInSolution, setDuplicateLettersInSolution] = useState("")
 
     const setBackgroundColor = (id, color) => {
         let currentLetter = document.getElementById(id)
@@ -19,25 +21,42 @@ function WordleSolver() {
         setIsFirstGuessSubmitted(true)
         let updatedIndexTracker = [...indexTracker]
         let updatedIncludedLetters = includedLetters
-        
+        let updatedDuplicateLettersInSolution = duplicateLettersInSolution
+        let duplicateLetterIndexes = []
+
+        if(duplicateLetterInGuess !== ""){
+            for(let i = 0; i < 5; i++){
+                if(guess.charAt(i) === duplicateLetterInGuess){
+                    duplicateLetterIndexes.push(i)
+                }
+            }  
+            let colorAtIndex0 = document.getElementById(`${guess}-${duplicateLetterIndexes[0]}`).style.backgroundColor
+            let colorAtIndex1 = document.getElementById(`${guess}-${duplicateLetterIndexes[1]}`).style.backgroundColor
+            console.log(colorAtIndex0, colorAtIndex1)
+
+            if(colorAtIndex0 !== "rgb(120, 124, 126)" && colorAtIndex1 !== "rgb(120, 124, 126)"){
+                updatedDuplicateLettersInSolution = duplicateLetterInGuess
+            }
+        }
+
         for(let i = 0; i < 5; i++){
             let currentLetterColor = document.getElementById(`${guess}-${i}`).style.backgroundColor
 
-            if(currentLetterColor === "green" && indexTracker[i].includes("^")){
+            if(currentLetterColor === "rgb(106, 170, 100)" && indexTracker[i].includes("^")){
                 updatedIndexTracker[i] = guess.charAt(i)
                 updatedIncludedLetters = updatedIncludedLetters.replaceAll(guess.charAt(i),"")
             }
 
-            if(currentLetterColor === "yellow" && updatedIncludedLetters.includes(guess.charAt(i))){
+            if(currentLetterColor === "rgb(201, 180, 88)" && updatedIncludedLetters.includes(guess.charAt(i))){
                 updatedIndexTracker[i] =  updatedIndexTracker[i] + guess.charAt(i)
             }
 
-            if(currentLetterColor === "yellow" && !updatedIncludedLetters.includes(guess.charAt(i))){
+            if(currentLetterColor === "rgb(201, 180, 88)" && !updatedIncludedLetters.includes(guess.charAt(i))){
                 updatedIncludedLetters = updatedIncludedLetters + guess.charAt(i)
                 updatedIndexTracker[i] =  updatedIndexTracker[i] + guess.charAt(i)
             }
 
-            if(currentLetterColor === "black"){
+            if(currentLetterColor === "rgb(120, 124, 126)"){
                 for(let j = 0; j < 5; j++){
                     if(updatedIndexTracker[j].includes("^")){
                         updatedIndexTracker[j] = updatedIndexTracker[j] + guess.charAt(i)
@@ -45,9 +64,12 @@ function WordleSolver() {
                 }
             }
         }
+    
         setIndexTracker(updatedIndexTracker)
         setIncludedLetters(updatedIncludedLetters)
-        updateWordList(updatedIncludedLetters, updatedIndexTracker)
+        setDuplicateLettersInSolution(updatedDuplicateLettersInSolution)
+        updateWordList(updatedIncludedLetters, updatedIndexTracker, updatedDuplicateLettersInSolution)
+        setDuplicateLetterInGuess("")
     }
 
     const regexGenerator = (includedLettersString, positionArray) => {
@@ -70,17 +92,27 @@ function WordleSolver() {
         return regex
     }
 
-    const updateWordList = (includedLettersString, positionArray) => {
+    const updateWordList = (includedLettersString, positionArray, duplicateLettersInSolution) => {
         const regex = regexGenerator(includedLettersString, positionArray)
         
         let updatedWordList = []
+        console.log(duplicateLettersInSolution)
 
-        for( let i = 0; i < wordList.length; i++){
-            if(regex.test(wordList[i])){
-                updatedWordList = [...updatedWordList, wordList[i]]
+        if(duplicateLettersInSolution !== ""){
+            for( let i = 0; i < wordList.length; i++){
+                if(wordList[i].indexOf(duplicateLettersInSolution) !== wordList[i].lastIndexOf(duplicateLettersInSolution) && regex.test(wordList[i])){
+                    updatedWordList = [...updatedWordList, wordList[i]]
+                }
+            }  
+            console.log(updatedWordList)
+        }else{
+            for( let i = 0; i < wordList.length; i++){
+                if(regex.test(wordList[i])){
+                    updatedWordList = [...updatedWordList, wordList[i]]
+                }
             }
-        }
-        console.log(updatedWordList)
+            console.log(updatedWordList)
+        } 
         setWordList(updatedWordList)
     }
 
@@ -134,6 +166,7 @@ function WordleSolver() {
         setWordList(wordList.filter((word) => {
            return word !== nextGuess
         }))
+        checkForDuplicateLetters(nextGuess)
     }
 
     const findWordListLength = (guess, solution) => {
@@ -173,6 +206,16 @@ function WordleSolver() {
         return newWordListLength
     }
 
+    const checkForDuplicateLetters = (guess) => {
+        for(let i = 0; i < guess.length; i++){
+            if(guess.indexOf(guess.charAt(i)) !== guess.lastIndexOf(guess.charAt(i))){
+                setDuplicateLetterInGuess(guess.charAt(i))
+                console.log('duplicate')
+                break
+            }
+        }
+    }
+
     useEffect(() => {
         if(isFirstGuessSubmitted){
             findNextGuess()
@@ -181,6 +224,7 @@ function WordleSolver() {
 
     return (
         <div>
+            <div className="title">Wordle Solver</div>
             {guesses.map((guess) => (
                 <div className= "word" key={guess}>
                     <div className="letter-container">
@@ -190,17 +234,17 @@ function WordleSolver() {
                         <div className="btn-container">
                             <button 
                                 className="btn-green" 
-                                onClick={() => setBackgroundColor(`${guess}-0`, "green")}
+                                onClick={() => setBackgroundColor(`${guess}-0`, "rgb(106, 170, 100)")}
                             >
                             </button>
                             <button 
                                 className="btn-yellow"
-                                onClick={() => setBackgroundColor(`${guess}-0`, "yellow")}
+                                onClick={() => setBackgroundColor(`${guess}-0`, "rgb(201, 180, 88)")}
                             >
                             </button>
                             <button 
-                                className="btn-black"
-                                onClick={() => setBackgroundColor(`${guess}-0`, "black")}
+                                className="btn-grey"
+                                onClick={() => setBackgroundColor(`${guess}-0`, "rgb(120, 124, 126)")}
                             >
                             </button>
                         </div>
@@ -212,17 +256,17 @@ function WordleSolver() {
                         <div className="btn-container">
                             <button 
                                 className="btn-green" 
-                                onClick={() => setBackgroundColor(`${guess}-1`, "green")}
+                                onClick={() => setBackgroundColor(`${guess}-1`, "rgb(106, 170, 100)")}
                             >
                             </button>
                             <button 
                                 className="btn-yellow"
-                                onClick={() => setBackgroundColor(`${guess}-1`, "yellow")}
+                                onClick={() => setBackgroundColor(`${guess}-1`, "rgb(201, 180, 88)")}
                             >
                             </button>
                             <button 
-                                className="btn-black"
-                                onClick={() => setBackgroundColor(`${guess}-1`, "black")}
+                                className="btn-grey"
+                                onClick={() => setBackgroundColor(`${guess}-1`, "rgb(120, 124, 126)")}
                             >
                             </button>
                         </div>
@@ -234,17 +278,17 @@ function WordleSolver() {
                         <div className="btn-container">
                             <button 
                                 className="btn-green" 
-                                onClick={() => setBackgroundColor(`${guess}-2`, "green")}
+                                onClick={() => setBackgroundColor(`${guess}-2`, "rgb(106, 170, 100)")}
                             >
                             </button>
                             <button 
                                 className="btn-yellow"
-                                onClick={() => setBackgroundColor(`${guess}-2`, "yellow")}
+                                onClick={() => setBackgroundColor(`${guess}-2`, "rgb(201, 180, 88)")}
                             >
                             </button>
                             <button 
-                                className="btn-black"
-                                onClick={() => setBackgroundColor(`${guess}-2`, "black")}
+                                className="btn-grey"
+                                onClick={() => setBackgroundColor(`${guess}-2`, "rgb(120, 124, 126)")}
                             >
                             </button>
                         </div>
@@ -256,17 +300,17 @@ function WordleSolver() {
                         <div className="btn-container">
                             <button 
                                 className="btn-green" 
-                                onClick={() => setBackgroundColor(`${guess}-3`, "green")}
+                                onClick={() => setBackgroundColor(`${guess}-3`, "rgb(106, 170, 100)")}
                             >
                             </button>
                             <button 
                                 className="btn-yellow"
-                                onClick={() => setBackgroundColor(`${guess}-3`, "yellow")}
+                                onClick={() => setBackgroundColor(`${guess}-3`, "rgb(201, 180, 88)")}
                             >
                             </button>
                             <button 
-                                className="btn-black"
-                                onClick={() => setBackgroundColor(`${guess}-3`, "black")}
+                                className="btn-grey"
+                                onClick={() => setBackgroundColor(`${guess}-3`, "rgb(120, 124, 126)")}
                             >
                             </button>
                         </div>
@@ -278,17 +322,17 @@ function WordleSolver() {
                         <div className="btn-container">
                             <button 
                                 className="btn-green" 
-                                onClick={() => setBackgroundColor(`${guess}-4`, "green")}
+                                onClick={() => setBackgroundColor(`${guess}-4`, "rgb(106, 170, 100)")}
                             >
                             </button>
                             <button 
                                 className="btn-yellow"
-                                onClick={() => setBackgroundColor(`${guess}-4`, "yellow")}
+                                onClick={() => setBackgroundColor(`${guess}-4`, "rgb(201, 180, 88)")}
                             >
                             </button>
                             <button 
-                                className="btn-black"
-                                onClick={() => setBackgroundColor(`${guess}-4`, "black")}
+                                className="btn-grey"
+                                onClick={() => setBackgroundColor(`${guess}-4`, "rgb(120, 124, 126)")}
                             >
                             </button>
                         </div>

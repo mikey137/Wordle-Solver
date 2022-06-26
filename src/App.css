@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Tinos:wght@700&display=swap");
+
 .App {
   text-align: center;
   display: flex;
@@ -5,6 +7,16 @@
   justify-content: center;
   align-items: center;
   font-family: "Libre Franklin", sans-serif;
+}
+
+.title {
+  font-family: "Tinos", serif;
+  font-weight: 700;
+  font-size: 2.25rem;
+  line-height: 100%;
+  letter-spacing: 0.01em;
+  text-align: center;
+  pointer-events: none;
 }
 
 .letter-container {
@@ -16,12 +28,13 @@
 }
 
 .letter {
-  font-size: 2.5rem;
-  border: 2px solid black;
-  margin: 1rem;
+  font-size: 2rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  border: 2px solid #d3d6da;
+  margin: 0.25rem;
   width: 4rem;
   height: 4rem;
-  border-radius: 10px;
   text-align: center;
   line-height: 4rem;
 }
@@ -45,13 +58,13 @@ button {
 }
 
 .btn-green {
-  background-color: green;
+  background-color: rgb(106, 170, 100);
 }
 
 .btn-yellow {
-  background-color: yellow;
+  background-color: rgb(201, 180, 88);
 }
 
-.btn-black {
-  background-color: black;
+.btn-grey {
+  background-color: #787c7e;
 }
