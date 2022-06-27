@@ -6,7 +6,11 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  font-family: "Libre Franklin", sans-serif;
+  font-family: sans-serif;
+  background-color: black;
+  color: white;
+  width: 100vw;
+  height: 100vh;
 }
 
 .title {
@@ -19,7 +23,22 @@
   pointer-events: none;
 }
 
+.guess-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.word {
+  display: flex;
+  width: 90vw;
+  max-width: 400px;
+  margin-bottom: 1rem;
+}
+
 .letter-container {
+  width: 18%;
   margin: 0 5px;
   display: flex;
   flex-direction: column;
@@ -37,19 +56,14 @@
   height: 4rem;
   text-align: center;
   line-height: 4rem;
-}
-
-.word {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  background-color: transparent;
 }
 
 .btn-container {
   display: flex;
 }
 
-button {
+.btn {
   height: 1rem;
   width: 1rem;
   margin: 0 5px;
@@ -67,4 +81,75 @@ button {
 
 .btn-grey {
   background-color: #787c7e;
+}
+
+.submit-guess {
+  background-color: #ea4c89;
+  border-radius: 8px;
+  border-style: none;
+  box-sizing: border-box;
+  color: #ffffff;
+  cursor: pointer;
+  display: inline-block;
+  font-size: 16px;
+  font-weight: 500;
+  height: 40px;
+  line-height: 20px;
+  list-style: none;
+  margin: 0;
+  outline: none;
+  padding: 10px 16px;
+  position: relative;
+  text-align: center;
+  text-decoration: none;
+  transition: color 100ms;
+  vertical-align: baseline;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  margin-bottom: 1rem;
+}
+
+.submit-guess:disabled {
+  background-color: grey;
+}
+.submit-guess:hover:enabled,
+.submit-guess:focus:enabled {
+  background-color: #f082ac;
+}
+
+.display-none {
+  display: none;
+}
+
+.start-over {
+  background-color: orange;
+  border-radius: 8px;
+  border-style: none;
+  box-sizing: border-box;
+  color: #ffffff;
+  cursor: pointer;
+  display: inline-block;
+  font-size: 16px;
+  font-weight: 500;
+  height: 40px;
+  line-height: 20px;
+  list-style: none;
+  margin: 0;
+  outline: none;
+  padding: 10px 16px;
+  position: relative;
+  text-align: center;
+  text-decoration: none;
+  transition: color 100ms;
+  vertical-align: baseline;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  margin-bottom: 1rem;
+}
+
+.start-over:hover,
+.start-over:focus {
+  background-color: salmon;
 }
