@@ -61,12 +61,14 @@
 
 .btn-container {
   display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 4rem;
 }
 
 .btn {
   height: 1rem;
   width: 1rem;
-  margin: 0 5px;
   border: none;
   border-radius: 5px;
 }
