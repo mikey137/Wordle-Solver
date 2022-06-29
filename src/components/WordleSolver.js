@@ -2,6 +2,9 @@ import React from 'react';
 import { useEffect } from 'react';
 import { useState } from 'react';
 import WordList from '../WordList'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faCircleQuestion } from '@fortawesome/free-solid-svg-icons'
+import InstructionsModal from './InstructionsModal';
 
 function WordleSolver() {
     const [guesses, setGuesses] = useState(["raise"])
@@ -13,6 +16,11 @@ function WordleSolver() {
     const [duplicateLettersInSolution, setDuplicateLettersInSolution] = useState("")
     const [isButtonDisabled, setIsButtonDisabled] = useState(true)
     const [isError, setIsError] = useState(false)
+    const [isModalOpen, setIsModalOpen] = useState(false)
+
+    const handleOpenModal = () => {
+        setIsModalOpen(true)
+    }
 
     const setBackgroundColor = (id, color) => {
         let currentLetter = document.getElementById(id)
@@ -249,7 +257,14 @@ function WordleSolver() {
 
     return (
         <div>
+            <InstructionsModal isModalOpen = {isModalOpen} setIsModalOpen = {setIsModalOpen}/>
+            <FontAwesomeIcon 
+                icon={faCircleQuestion}     
+                className = "question-icon"
+                onClick={handleOpenModal}
+            />
             <div className="title">Wordle Solver</div>
+            
             {guesses.map((guess) => (
                 <div className= "guess-container" key={guess}>
                     <div className="word">
@@ -257,7 +272,7 @@ function WordleSolver() {
                             <div className="letter" id={`${guess}-0`}>
                                 {guess.charAt(0)}
                             </div>
-                            <div className="btn-container">
+                            <div className={guesses[guesses.length - 1] === guess ? "btn-container" : "display-none"}>
                                 <button 
                                     className="btn btn-green" 
                                     onClick={() => setBackgroundColor(`${guess}-0`, "rgb(106, 170, 100)")}
@@ -279,7 +294,7 @@ function WordleSolver() {
                             <div className="letter" id={`${guess}-1`}>
                                 {guess.charAt(1)}
                             </div>
-                            <div className="btn-container">
+                            <div className={guesses[guesses.length - 1] === guess ? "btn-container" : "display-none"}>
                                 <button 
                                     className="btn btn-green" 
                                     onClick={() => setBackgroundColor(`${guess}-1`, "rgb(106, 170, 100)")}
@@ -301,7 +316,7 @@ function WordleSolver() {
                             <div className="letter" id={`${guess}-2`}>
                                 {guess.charAt(2)}
                             </div>
-                            <div className="btn-container">
+                            <div className={guesses[guesses.length - 1] === guess ? "btn-container" : "display-none"}>
                                 <button 
                                     className="btn btn-green" 
                                     onClick={() => setBackgroundColor(`${guess}-2`, "rgb(106, 170, 100)")}
@@ -323,7 +338,7 @@ function WordleSolver() {
                             <div className="letter" id={`${guess}-3`}>
                                 {guess.charAt(3)}
                             </div>
-                            <div className="btn-container">
+                            <div className={guesses[guesses.length - 1] === guess ? "btn-container" : "display-none"}>
                                 <button 
                                     className="btn btn-green" 
                                     onClick={() => setBackgroundColor(`${guess}-3`, "rgb(106, 170, 100)")}
@@ -345,7 +360,7 @@ function WordleSolver() {
                             <div className="letter" id={`${guess}-4`}>
                                 {guess.charAt(4)}
                             </div>
-                            <div className="btn-container">
+                            <div className={guesses[guesses.length - 1] === guess ? "btn-container" : "display-none"}>
                                 <button 
                                     className="btn btn-green" 
                                     onClick={() => setBackgroundColor(`${guess}-4`, "rgb(106, 170, 100)")}
