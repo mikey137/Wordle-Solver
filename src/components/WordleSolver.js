@@ -12,7 +12,7 @@ function WordleSolver() {
     const [includedLetters, setIncludedLetters] = useState("")
     const [wordList, setWordList] = useState(WordList)
     const [isFirstGuessSubmitted, setIsFirstGuessSubmitted] = useState(false)
-    const [duplicateLetterInGuess, setDuplicateLetterInGuess] = useState("")
+    const [duplicateLetterInGuess, setDuplicateLetterInGuess] = useState()
     const [duplicateLettersInSolution, setDuplicateLettersInSolution] = useState("")
     const [isButtonDisabled, setIsButtonDisabled] = useState(true)
     const [isError, setIsError] = useState(false)
@@ -43,7 +43,7 @@ function WordleSolver() {
         let updatedDuplicateLettersInSolution = duplicateLettersInSolution
         let duplicateLetterIndexes = []
 
-        if(duplicateLetterInGuess !== ""){
+        if(duplicateLetterInGuess){
             for(let i = 0; i < 5; i++){
                 if(guess.charAt(i) === duplicateLetterInGuess){
                     duplicateLetterIndexes.push(i)
@@ -55,6 +55,14 @@ function WordleSolver() {
 
             if(colorAtIndex0 !== "rgb(120, 124, 126)" && colorAtIndex1 !== "rgb(120, 124, 126)"){
                 updatedDuplicateLettersInSolution = duplicateLetterInGuess
+            }
+
+            if(colorAtIndex0 === "rgb(120, 124, 126)" && colorAtIndex1 === "rgb(120, 124, 126)"){
+                for(let j = 0; j < 5; j++){
+                    if(updatedIndexTracker[j].includes("^")){
+                        updatedIndexTracker[j] = updatedIndexTracker[j] + duplicateLetterInGuess
+                    }
+                }
             }
         }
 
@@ -75,7 +83,7 @@ function WordleSolver() {
                 updatedIndexTracker[i] =  updatedIndexTracker[i] + guess.charAt(i)
             }
 
-            if(currentLetterColor === "rgb(120, 124, 126)"){
+            if(currentLetterColor === "rgb(120, 124, 126)" && guess.charAt(i) !== duplicateLetterInGuess){
                 for(let j = 0; j < 5; j++){
                     if(updatedIndexTracker[j].includes("^")){
                         updatedIndexTracker[j] = updatedIndexTracker[j] + guess.charAt(i)
@@ -113,9 +121,7 @@ function WordleSolver() {
 
     const updateWordList = (includedLettersString, positionArray, duplicateLettersInSolution) => {
         const regex = regexGenerator(includedLettersString, positionArray)
-        
         let updatedWordList = []
-        console.log(duplicateLettersInSolution)
 
         if(duplicateLettersInSolution !== ""){
             for( let i = 0; i < wordList.length; i++){
@@ -138,29 +144,6 @@ function WordleSolver() {
             setIsError(true)
         }
     }
-
-    // const findNextGuess = () => {
-    //     let nextGuess = ""
-    //     let nextGuessSum = 10000
-
-    //     for(let i = 0; i < wordList.length; i++){
-    //         let currentGuess = wordList[i]
-    //         let sum = 0
-    //         for(let j = 0; j < wordList.length; j++){
-    //             sum = sum + findWordListLength(wordList[i], wordList[j])
-    //         }
-    //         if(sum < nextGuessSum){
-    //             nextGuess = currentGuess
-    //             nextGuessSum = sum
-    //         }
-    //         console.log(currentGuess,sum)
-    //     }
-
-    //     setGuesses([...guesses, nextGuess])
-    //     setWordList(wordList.filter((word) => {
-    //        return word !== nextGuess
-    //     }))
-    // }
 
     const findNextGuess = () => {
         let nextGuess = ""
