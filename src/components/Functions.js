@@ -1,7 +1,11 @@
-const submitGuess = (guess, indexTracker, includedLetters, duplicateLettersInSolution, duplicateLetterInGuess) => {
-    let updatedIndexTracker = [...indexTracker]
-    let updatedIncludedLetters = includedLetters
-    let updatedDuplicateLettersInSolution = duplicateLettersInSolution
+import WordList from "../WordList"
+
+let wordList = WordList
+let includedLetters = ""
+let indexTracker = ["^", "^", "^", "^", "^"]
+let duplicateLettersInSolution = ""
+
+const submitGuess = (guess, duplicateLetterInGuess) => {
     let duplicateLetterIndexes = []
 
     if(duplicateLetterInGuess){
@@ -15,13 +19,13 @@ const submitGuess = (guess, indexTracker, includedLetters, duplicateLettersInSol
         console.log(colorAtIndex0, colorAtIndex1)
 
         if(colorAtIndex0 !== "rgb(120, 124, 126)" && colorAtIndex1 !== "rgb(120, 124, 126)"){
-            updatedDuplicateLettersInSolution = duplicateLetterInGuess
+            duplicateLettersInSolution = duplicateLetterInGuess
         }
 
         if(colorAtIndex0 === "rgb(120, 124, 126)" && colorAtIndex1 === "rgb(120, 124, 126)"){
             for(let j = 0; j < 5; j++){
-                if(updatedIndexTracker[j].includes("^")){
-                    updatedIndexTracker[j] = updatedIndexTracker[j] + duplicateLetterInGuess
+                if(indexTracker[j].includes("^")){
+                    indexTracker[j] = indexTracker[j] + duplicateLetterInGuess
                 }
             }
         }
@@ -31,32 +35,32 @@ const submitGuess = (guess, indexTracker, includedLetters, duplicateLettersInSol
         let currentLetterColor = document.getElementById(`${guess}-${i}`).style.backgroundColor
 
         if(currentLetterColor === "rgb(106, 170, 100)" && indexTracker[i].includes("^")){
-            updatedIndexTracker[i] = guess.charAt(i)
-            updatedIncludedLetters = updatedIncludedLetters.replaceAll(guess.charAt(i),"")
+            indexTracker[i] = guess.charAt(i)
+            includedLetters = includedLetters.replaceAll(guess.charAt(i),"")
         }
 
-        if(currentLetterColor === "rgb(201, 180, 88)" && updatedIncludedLetters.includes(guess.charAt(i))){
-            updatedIndexTracker[i] =  updatedIndexTracker[i] + guess.charAt(i)
+        if(currentLetterColor === "rgb(201, 180, 88)" && includedLetters.includes(guess.charAt(i))){
+            indexTracker[i] =  indexTracker[i] + guess.charAt(i)
         }
 
-        if(currentLetterColor === "rgb(201, 180, 88)" && !updatedIncludedLetters.includes(guess.charAt(i))){
-            updatedIncludedLetters = updatedIncludedLetters + guess.charAt(i)
-            updatedIndexTracker[i] =  updatedIndexTracker[i] + guess.charAt(i)
+        if(currentLetterColor === "rgb(201, 180, 88)" && !includedLetters.includes(guess.charAt(i))){
+            includedLetters = includedLetters + guess.charAt(i)
+            indexTracker[i] =  indexTracker[i] + guess.charAt(i)
         }
 
         if(currentLetterColor === "rgb(120, 124, 126)" && guess.charAt(i) !== duplicateLetterInGuess){
             for(let j = 0; j < 5; j++){
-                if(updatedIndexTracker[j].includes("^")){
-                    updatedIndexTracker[j] = updatedIndexTracker[j] + guess.charAt(i)
+                if(indexTracker[j].includes("^")){
+                    indexTracker[j] = indexTracker[j] + guess.charAt(i)
                 }
             }
         }
     }
-    return {updatedIndexTracker, updatedIncludedLetters, updatedDuplicateLettersInSolution}    
+    return {includedLetters}    
 }
 
-const updateWordList = (wordList, includedLettersString, positionArray, duplicateLettersInSolution) => {
-    const regex = regexGenerator(includedLettersString, positionArray)
+const updateWordList = () => {
+    const regex = regexGenerator(includedLetters, indexTracker)
     let updatedWordList = []
 
     if(duplicateLettersInSolution !== ""){
@@ -73,10 +77,10 @@ const updateWordList = (wordList, includedLettersString, positionArray, duplicat
             }
         }
     } 
-    return updatedWordList
+    wordList = updatedWordList
 }
 
-const regexGenerator = (includedLettersString, positionArray) => {
+const regexGenerator = (includedLettersString, indexTrackerArray) => {
     let expressionSectionOne = ""
     let expressionLastSection = ""
 
@@ -85,10 +89,10 @@ const regexGenerator = (includedLettersString, positionArray) => {
     }
 
     for(let j = 0; j < 5; j++){
-        if(positionArray[j].includes("^")){
-            expressionLastSection = expressionLastSection + `[${positionArray[j]}]`
+        if(indexTrackerArray[j].includes("^")){
+            expressionLastSection = expressionLastSection + `[${indexTrackerArray[j]}]`
         }else{
-            expressionLastSection = expressionLastSection + positionArray[j]
+            expressionLastSection = expressionLastSection + indexTrackerArray[j]
         }
     }
 
@@ -96,7 +100,7 @@ const regexGenerator = (includedLettersString, positionArray) => {
     return regex
 }
 
-const findNextGuess = (wordList, indexTracker, includedLetters) => {
+const findNextGuess = () => {
     let nextGuess = ""
     let nextGuessWorstCase = 10000
 
@@ -104,7 +108,7 @@ const findNextGuess = (wordList, indexTracker, includedLetters) => {
         let currentGuess = wordList[i]
         let worstCase = 0
         for(let j = 0; j < wordList.length; j++){
-            let currentCase = findWordListLength(wordList[i], wordList[j], indexTracker, includedLetters, wordList)
+            let currentCase = findWordListLength(wordList[i], wordList[j])
             if(currentCase >= nextGuessWorstCase){
                 worstCase = currentCase
                 break
@@ -119,10 +123,13 @@ const findNextGuess = (wordList, indexTracker, includedLetters) => {
             nextGuess = currentGuess
         }
     }
+    wordList = wordList.filter((word) => {
+        return word !== nextGuess
+    })
     return nextGuess
 }
 
-const findWordListLength = (guess, solution, indexTracker, includedLetters, wordList) => {
+const findWordListLength = (guess, solution) => {
     let updatedIndexTracker = [...indexTracker]
     let updatedIncludedLetters = includedLetters
 
@@ -158,8 +165,6 @@ const findWordListLength = (guess, solution, indexTracker, includedLetters, word
 
     return newWordListLength
 }
-
-
 
 export const Functions = {
     submitGuess,

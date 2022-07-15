@@ -1,7 +1,6 @@
 import React from 'react';
 import { useEffect } from 'react';
 import { useState } from 'react';
-import WordList from '../WordList'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCircleQuestion } from '@fortawesome/free-solid-svg-icons'
 import InstructionsModal from './InstructionsModal';
@@ -9,12 +8,7 @@ import { Functions } from './Functions';
 
 function WordleSolver() {
     const [guesses, setGuesses] = useState(["raise"])
-    const [indexTracker, setIndexTracker] = useState(["^", "^", "^", "^", "^"])
-    const [includedLetters, setIncludedLetters] = useState("")
-    const [wordList, setWordList] = useState(WordList)
-    const [isFirstGuessSubmitted, setIsFirstGuessSubmitted] = useState(false)
     const [duplicateLetterInGuess, setDuplicateLetterInGuess] = useState()
-    const [duplicateLettersInSolution, setDuplicateLettersInSolution] = useState("")
     const [isButtonDisabled, setIsButtonDisabled] = useState(true)
     const [isError, setIsError] = useState(false)
     const [isModalOpen, setIsModalOpen] = useState(false)
@@ -37,28 +31,20 @@ function WordleSolver() {
     } 
 
     const handleGuessSubmit = async () => {
-        setIsButtonDisabled(true)
-        setIsFirstGuessSubmitted(true)
-
-        const updates = Functions.submitGuess(guesses[guesses.length - 1], indexTracker, includedLetters, duplicateLettersInSolution, duplicateLetterInGuess)
-
-        const updatedWordList = Functions.updateWordList(wordList, updates.updatedIncludedLetters, updates.updatedIndexTracker, updates.updatedDuplicateLettersInSolution)
-
-        setIndexTracker(updates.updatedIndexTracker)
-        setIncludedLetters(updates.updatedIncludedLetters)
-        setDuplicateLettersInSolution(updates.updatedDuplicateLettersInSolution)
-        setWordList(updatedWordList)
+        Functions.submitGuess(guesses[guesses.length - 1], duplicateLetterInGuess)
+        Functions.updateWordList()
+        handleFindNextGuess()
         setDuplicateLetterInGuess("")
+        setIsButtonDisabled(true)
     }
 
     const handleFindNextGuess = () => {
-        let nextGuess = Functions.findNextGuess(wordList, indexTracker, includedLetters)
-        
+        let nextGuess = Functions.findNextGuess()
         setGuesses([...guesses, nextGuess])
-        setWordList(wordList.filter((word) => {
-           return word !== nextGuess
-        }))
         checkForDuplicateLetters(nextGuess)
+        if(nextGuess === ""){
+            setIsError(true)
+        }
     }
 
     const checkForDuplicateLetters = (guess) => {
@@ -74,12 +60,6 @@ function WordleSolver() {
     const startOver = () => {
         window.location.reload(false)
     }
-
-    useEffect(() => {
-        if(isFirstGuessSubmitted){
-            handleFindNextGuess()
-        }  
-    },[indexTracker])
 
     useEffect(() => {
         for(let i = 0; i < guesses.length - 1; i++){
