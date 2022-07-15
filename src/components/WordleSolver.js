@@ -8,7 +8,6 @@ import { Functions } from './Functions';
 
 function WordleSolver() {
     const [guesses, setGuesses] = useState(["raise"])
-    const [duplicateLetterInGuess, setDuplicateLetterInGuess] = useState()
     const [isButtonDisabled, setIsButtonDisabled] = useState(true)
     const [isError, setIsError] = useState(false)
     const [isModalOpen, setIsModalOpen] = useState(false)
@@ -31,29 +30,17 @@ function WordleSolver() {
     } 
 
     const handleGuessSubmit = async () => {
-        Functions.submitGuess(guesses[guesses.length - 1], duplicateLetterInGuess)
+        Functions.submitGuess(guesses[guesses.length - 1])
         Functions.updateWordList()
         handleFindNextGuess()
-        setDuplicateLetterInGuess("")
         setIsButtonDisabled(true)
     }
 
     const handleFindNextGuess = () => {
         let nextGuess = Functions.findNextGuess()
         setGuesses([...guesses, nextGuess])
-        checkForDuplicateLetters(nextGuess)
         if(nextGuess === ""){
             setIsError(true)
-        }
-    }
-
-    const checkForDuplicateLetters = (guess) => {
-        for(let i = 0; i < guess.length; i++){
-            if(guess.indexOf(guess.charAt(i)) !== guess.lastIndexOf(guess.charAt(i))){
-                setDuplicateLetterInGuess(guess.charAt(i))
-                console.log('duplicate')
-                break
-            }
         }
     }
 

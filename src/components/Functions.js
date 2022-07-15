@@ -4,8 +4,10 @@ let wordList = WordList
 let includedLetters = ""
 let indexTracker = ["^", "^", "^", "^", "^"]
 let duplicateLettersInSolution = ""
+let duplicateLetterInGuess = ""
 
-const submitGuess = (guess, duplicateLetterInGuess) => {
+const submitGuess = (guess) => {
+    checkForDuplicateLetters(guess)
     let duplicateLetterIndexes = []
 
     if(duplicateLetterInGuess){
@@ -16,10 +18,9 @@ const submitGuess = (guess, duplicateLetterInGuess) => {
         }  
         let colorAtIndex0 = document.getElementById(`${guess}-${duplicateLetterIndexes[0]}`).style.backgroundColor
         let colorAtIndex1 = document.getElementById(`${guess}-${duplicateLetterIndexes[1]}`).style.backgroundColor
-        console.log(colorAtIndex0, colorAtIndex1)
 
-        if(colorAtIndex0 !== "rgb(120, 124, 126)" && colorAtIndex1 !== "rgb(120, 124, 126)"){
-            duplicateLettersInSolution = duplicateLetterInGuess
+        if(colorAtIndex0 !== "rgb(120, 124, 126)" && colorAtIndex1 !== "rgb(120, 124, 126)" && duplicateLetterInGuess !== duplicateLettersInSolution){
+            duplicateLettersInSolution = duplicateLettersInSolution + duplicateLetterInGuess
         }
 
         if(colorAtIndex0 === "rgb(120, 124, 126)" && colorAtIndex1 === "rgb(120, 124, 126)"){
@@ -28,6 +29,10 @@ const submitGuess = (guess, duplicateLetterInGuess) => {
                     indexTracker[j] = indexTracker[j] + duplicateLetterInGuess
                 }
             }
+        }
+
+        if(colorAtIndex0 === "rgb(106, 170, 100)" && colorAtIndex1 === "rgb(106, 170, 100)"){
+            includedLetters = includedLetters.replace(duplicateLetterInGuess, '')
         }
     }
 
@@ -55,12 +60,15 @@ const submitGuess = (guess, duplicateLetterInGuess) => {
                 }
             }
         }
-    }
-    return {includedLetters}    
+    } 
+    console.log(`indexTracker:${indexTracker}`)
+    console.log(`includedLetters:${includedLetters}`)
+    console.log(`duplicateLettersInSolution:${duplicateLettersInSolution}`)  
 }
 
 const updateWordList = () => {
     const regex = regexGenerator(includedLetters, indexTracker)
+    console.log(regex)
     let updatedWordList = []
 
     if(duplicateLettersInSolution !== ""){
@@ -101,6 +109,7 @@ const regexGenerator = (includedLettersString, indexTrackerArray) => {
 }
 
 const findNextGuess = () => {
+    duplicateLetterInGuess = ""
     let nextGuess = ""
     let nextGuessWorstCase = 10000
 
@@ -164,6 +173,18 @@ const findWordListLength = (guess, solution) => {
     }).length
 
     return newWordListLength
+}
+
+const checkForDuplicateLetters = (guess) => {
+    for(let i = 0; i < guess.length; i++){
+        if(guess.indexOf(guess.charAt(i)) !== guess.lastIndexOf(guess.charAt(i))){
+            duplicateLetterInGuess = guess.charAt(i)
+            break
+        }else{
+            duplicateLetterInGuess = ""
+        }
+    }
+    console.log(duplicateLetterInGuess)
 }
 
 export const Functions = {
